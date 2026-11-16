@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Разбор кода: Процесс Рождения-Гибели</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #334155;
+            --heading-color: #0f172a;
+            --accent-color: #3b82f6;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+            --border-color: #e2e8f0;
+            --theory-bg: #f0fdf4;
+            --theory-border: #86efac;
+            --theory-text: #166534;
+            --func-bg: #fffbeb;
+            --func-border: #fcd34d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--heading-color);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: #1e40af;
+            margin-top: 1.5rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 1rem 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background-color: #e2e8f0;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #b91c1c;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        .theory-box {
+            background-color: var(--theory-bg);
+            border-left: 4px solid var(--theory-border);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .func-box {
+            background-color: var(--func-bg);
+            border-left: 4px solid var(--func-border);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .box-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .theory-box .box-title { color: var(--theory-text); }
+        .func-box .box-title { color: #b45309; }
+
+        .math {
+            font-style: italic;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1em;
+        }
+
+        ul, ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Разбор кода: Процесс Рождения-Гибели</h1>
+    
+    <div class="section">
+        <p>Этот документ представляет собой подробный разбор скрипта на языке Python, моделирующего процесс рождения и гибели (ПРГ) — один из фундаментальных классов марковских процессов в Теории Массового Обслуживания (ТМО).</p>
+        <p>Цель программы: найти стационарное распределение вероятностей <code>p_i</code> (долю времени, которую система проводит в состоянии с <code>i</code> заявками) тремя разными методами и сравнить их результаты.</p>
+    </div>
+
+    <!-- БЛОК 1: Инициализация -->
+    <div class="section">
+        <h2>1. Инициализация класса и параметров</h2>
+<pre><code>class BirthDeathProcess:
+    def __init__(self, lam, delta, eps, N, M, K):
+        self.lam = lam
+        self.delta = delta
+        self.eps = eps
+        self.N = N
+        self.M = M
+        self.K = K
+        self.n_states = K + 1
+        
+        # Сразу строим матрицу
+        self.A = self.build_matrix()</code></pre>
+        
+        <h3>Объяснение кода:</h3>
+        <p>Конструктор класса принимает параметры системы. Сохраняются интенсивность поступления (<code>lam</code>), коэффициенты обслуживания (<code>delta</code>, <code>eps</code>) и границы смены режимов обслуживания (<code>N</code>, <code>M</code>, <code>K</code>). Переменная <code>n_states</code> равна <code>K + 1</code>, так как состояния нумеруются от 0 до K включительно. Сразу при создании объекта вызывается метод <code>build_matrix()</code>.</p>
+
+        <div class="func-box">
+            <div class="box-title">⚙️ Разбор функций Python</div>
+            <ul>
+                <li><code>class</code>: Создает структуру (класс). Класс объединяет параметры системы и функции для их обработки.</li>
+                <li><code>__init__(self, ...)</code>: Метод-конструктор, который вызывается автоматически при создании объекта.</li>
+                <li><code>self</code>: Ссылка на сам объект. Позволяет сохранять переменные (например, <code>self.lam = lam</code>) так, чтобы они были доступны во всех остальных функциях этого класса.</li>
+            </ul>
+        </div>
+
+        <div class="theory-box">
+            <div class="theory-title">📚 Теория ТМО: Постановка задачи</div>
+            <p>Мы рассматриваем <strong>Систему Массового Обслуживания (СМО)</strong> с ограниченной вместимостью <span class="math">K</span>. Состояние системы <span class="math">i</span> — это количество заявок в системе.</p>
+            <ul>
+                <li>Интенсивность входного потока (рождение) постоянна: <span class="math">&lambda;<sub>i</sub> = &lambda;</span>. В ТМО это означает простейший (пуассоновский) поток заявок.</li>
+                <li>Интенсивность обслуживания (гибель) <span class="math">&mu;<sub>i</sub></span> зависит от текущего состояния. Это типично для систем, где при увеличении очереди подключаются новые каналы обслуживания или меняется скорость работы (в нашем случае меняется коэффициент с &delta; на &epsilon; и обратно).</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- БЛОК 2: Матрица интенсивностей -->
+    <div class="section">
+        <h2>2. Построение матрицы интенсивностей переходов</h2>
+<pre><code>    def build_matrix(self):
+        A = np.zeros((self.n_states, self.n_states))
+        for i in range(self.n_states):
+            # Гибель (шаг влево)
+            if i > 0:
+                if i <= self.N: mu = i * self.delta
+                elif i <= self.M: mu = i * self.eps
+                else: mu = i * self.delta
+                A[i, i - 1] = mu
+            
+            # Рождение (шаг вправо)
+            if i < self.K:
+                A[i, i + 1] = self.lam
+
+            # Диагональ
+            A[i, i] = -np.sum(A[i, :])
+            
+        return A</code></pre>
+
+        <h3>Объяснение кода:</h3>
+        <p>Метод создает квадратную матрицу <code>A</code>. Цикл проходит по всем состояниям от 0 до K.</p>
+        <ul>
+            <li><code>A[i, i - 1]</code> (под главной диагональю): интенсивность ухода в предыдущее состояние.</li>
+            <li><code>A[i, i + 1]</code> (над главной диагональю): интенсивность перехода в следующее состояние, всегда равна <code>lam</code>.</li>
+            <li><code>A[i, i]</code> (главная диагональ): сумма всех остальных элементов строки с отрицательным знаком.</li>
+        </ul>
+
+        <div class="func-box">
+            <div class="box-title">⚙️ Разбор функций NumPy</div>
+            <ul>
+                <li><code>np.zeros((строки, столбцы))</code>: Быстро создает матрицу нужного размера, заполненную нулями.</li>
+                <li><code>A[i, :]</code>: Синтаксис срезов. Означает "взять всю строку <code>i</code> (все её столбцы)".</li>
+                <li><code>np.sum(...)</code>: Вычисляет сумму элементов переданного массива. В данном случае мы суммируем все интенсивности выходов из состояния.</li>
+            </ul>
+        </div>
+
+        <div class="theory-box">
+            <div class="theory-title">📚 Теория ТМО: Инфинитезимальная матрица переходов</div>
+            <p>В непрерывном времени марковская цепь описывается не вероятностями переходов, а <strong>интенсивностями</strong> (матрицей инфинитезимальных характеристик <span class="math">A</span> или <span class="math">Q</span>).</p>
+            <p>Фундаментальное свойство такой матрицы: сумма элементов в каждой строке равна нулю (<span class="math">&Sigma;<sub>j</sub> a<sub>ij</sub> = 0</span>). Именно поэтому диагональный элемент всегда отрицателен и равен по модулю сумме интенсивностей выходов из состояния <span class="math">i</span>.</p>
+        </div>
+    </div>
+
+    <!-- БЛОК 3: Рекуррентный метод -->
+    <div class="section">
+        <h2>3. Аналитический расчет (Рекуррентный метод)</h2>
+<pre><code>    def solve_recursive(self):
+        p = np.zeros(self.n_states)
+        p[0] = 1.0  # Ненормированная вероятность
+        
+        for i in range(1, self.n_states):
+            if i <= self.N: mu = i * self.delta
+            elif i <= self.M: mu = i * self.eps
+            else: mu = i * self.delta
+                
+            p[i] = p[i - 1] * (self.lam / mu)
+            
+        return p / np.sum(p)  # Условие нормировки</code></pre>
+
+        <h3>Объяснение кода:</h3>
+        <p>Мы задаем стартовый "вес" <code>p[0] = 1.0</code>. Затем в цикле каждое следующее состояние вычисляется через предыдущее путем умножения на отношение интенсивностей <code>lam / mu</code>. В конце весь массив нормируется.</p>
+
+        <div class="func-box">
+            <div class="box-title">⚙️ Разбор функций NumPy</div>
+            <ul>
+                <li><code>p / np.sum(p)</code>: Демонстрация векторизованных операций (broadcasting). Мы делим весь массив <code>p</code> на число (сумму всех элементов). NumPy применяет это деление к каждому элементу массива автоматически, без использования медленных циклов.</li>
+            </ul>
+        </div>
+
+        <div class="theory-box">
+            <div class="theory-title">📚 Теория ТМО: Уравнения детального равновесия (Локальный баланс)</div>
+            <p>Для марковских цепей в виде прямой линии (0 ↔ 1 ↔ 2 ↔ ... ↔ K) действует правило: в стационарном режиме поток вероятности из <span class="math">i-1</span> в <span class="math">i</span> в точности равен возвратному потоку из <span class="math">i</span> в <span class="math">i-1</span>. Математически: <span class="math">p<sub>i-1</sub> &middot; &lambda; = p<sub>i</sub> &middot; &mu;<sub>i</sub></span>.</p>
+            <p>Отсюда выводится рекуррентная формула: <span class="math">p<sub>i</sub> = p<sub>i-1</sub> &middot; (&lambda; / &mu;<sub>i</sub>)</span>.</p>
+            <p>Вместо того чтобы разворачивать эту формулу в огромные степени и факториалы (что приводит к переполнению памяти), мы применяем <strong>метод весов</strong>: считаем вес <span class="math">p<sub>0</sub> = 1</span>, вычисляем остальные веса по цепочке, а затем делим каждый вес на их общую сумму. Это гарантирует выполнение <strong>условия нормировки</strong> (<span class="math">&Sigma; p<sub>i</sub> = 1</span>).</p>
+        </div>
+    </div>
+
+    <!-- БЛОК 4: Матричные методы -->
+    <div class="section">
+        <h2>4. Численные матричные методы</h2>
+<pre><code>    def solve_matrix(self):
+        vals, vecs = eig(self.A.T)
+        idx = np.argmin(np.abs(vals))
+        p = np.real(vecs[:, idx])
+        p = np.abs(p) 
+        return p / np.sum(p)
+
+    def solve_nullspace(self):
+        ns = null_space(self.A.T)
+        p = np.abs(ns[:, 0])
+        return p / np.sum(p)</code></pre>
+
+        <h3>Объяснение кода:</h3>
+        <p>Оба метода решают систему линейных алгебраических уравнений (СЛАУ), но разными алгоритмами линейной алгебры.</p>
+
+        <div class="func-box">
+            <div class="box-title">⚙️ Разбор функций SciPy и NumPy</div>
+            <ul>
+                <li><code>self.A.T</code>: Транспонирует матрицу (меняет строки и столбцы местами).</li>
+                <li><code>eig(...)</code>: Находит собственные значения и векторы матрицы. Возвращает кортеж <code>(значения, векторы)</code>.</li>
+                <li><code>np.abs(...)</code>: Модуль числа (для комплексных чисел — расстояние на комплексной плоскости). Избавляет нас от отрицательных знаков.</li>
+                <li><code>np.argmin(...)</code>: Находит минимальное значение в массиве и возвращает его <strong>индекс</strong>. Мы ищем собственное значение, ближайшее к 0.</li>
+                <li><code>np.real(...)</code>: Отбрасывает мнимую часть комплексного числа (возникающую из-за микро-погрешностей процессора).</li>
+                <li><code>null_space(...)</code>: Находит базис нуль-пространства (ядра) матрицы через сингулярное разложение (SVD).</li>
+            </ul>
+        </div>
+
+        <div class="theory-box">
+            <div class="theory-title">📚 Теория ТМО: Система уравнений Колмогорова (Глобальный баланс)</div>
+            <p>Если система сложнее прямой линии, детальное равновесие не работает. Используется <strong>уравнение глобального баланса</strong>: суммарный поток вероятностей <em>во</em> все состояния равен суммарному потоку <em>из</em> всех состояний. В векторном виде это выглядит как: <span class="math">&pi; &middot; A = 0</span>, где <span class="math">&pi;</span> — вектор-строка вероятностей.</p>
+            <p>Чтобы решить это стандартными библиотеками, уравнение транспонируют: <span class="math">A<sup>T</sup> &middot; &pi;<sup>T</sup> = 0 &middot; &pi;<sup>T</sup></span>. Математически это означает две вещи:</p>
+            <ol>
+                <li>Вектор <span class="math">&pi;<sup>T</sup></span> является <strong>собственным вектором</strong> матрицы <span class="math">A<sup>T</sup></span> для собственного значения <span class="math">&lambda;<sub>eig</sub> = 0</span>. (Это реализует метод <code>eig</code>).</li>
+                <li>Вектор <span class="math">&pi;<sup>T</sup></span> лежит в <strong>ядре (нуль-пространстве)</strong> матрицы <span class="math">A<sup>T</sup></span>, так как при умножении на неё дает ноль. Так как наша цепь эргодична, базис этого пространства состоит ровно из одного вектора. (Это реализует метод <code>null_space</code>).</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- БЛОК 5: Сравнение и Графики -->
+    <div class="section">
+        <h2>5. Анализ результатов и графики</h2>
+<pre><code>    # Цикл сравнения
+    for i in range(model.n_states):
+        diff = abs(p_rec[i] - p_mat[i])
+        print(f"{i}\t{p_rec[i]:.6f}\t{p_mat[i]:.6f}\t{diff:.2e}")
+
+    # Отрисовка графиков
+    plt.subplot(2, 1, 1)
+    plt.bar(x - 0.2, p_rec, width=0.4, label='Рекуррентный')
+    plt.bar(x + 0.2, p_mat, width=0.4, label='Матричный')
+    
+    plt.subplot(2, 1, 2)
+    plt.bar(x, np.abs(p_rec - p_mat), color='red')</code></pre>
+
+        <h3>Объяснение графиков:</h3>
+        <ul>
+            <li><strong>Верхний график (Вероятности):</strong> Столбцы двух методов визуально смещены, чтобы убедиться, что их высота идеально совпадает.</li>
+            <li><strong>Нижний график (Абсолютная разница):</strong> Показывает погрешность (<code>diff</code>). Она колеблется около <code>1e-16</code> (машинный нуль).</li>
+        </ul>
+
+        <div class="func-box">
+            <div class="box-title">⚙️ Форматирование и Matplotlib</div>
+            <ul>
+                <li><code>f"{значение:.6f}"</code>: Вывод числа (float) строго с 6 знаками после запятой.</li>
+                <li><code>f"{diff:.2e}"</code>: Вывод в научном формате. Разница будет выведена компактно (например, <code>1.23e-16</code>).</li>
+                <li><code>plt.subplot(rows, cols, index)</code>: Разделяет окно графика. <code>(2, 1, 1)</code> — сетка 2х1, рисуем в первой (верхней) ячейке.</li>
+                <li><code>plt.bar(x, height, width)</code>: Столбчатая диаграмма. Сдвиги <code>x - 0.2</code> и <code>x + 0.2</code> не дают столбцам наложиться друг на друга.</li>
+            </ul>
+        </div>
+
+        <div class="theory-box">
+            <div class="theory-title">📚 Теория ТМО: Показатели эффективности СМО</div>
+            <p>Стационарные вероятности <span class="math">p<sub>i</sub></span> — фундамент для расчета реальных метрик системы:</p>
+            <ul>
+                <li><strong>Вероятность простоя:</strong> <span class="math">p<sub>0</sub></span> (система пуста).</li>
+                <li><strong>Вероятность отказа:</strong> <span class="math">p<sub>K</sub></span> (очередь переполнена, новые заявки теряются).</li>
+                <li><strong>Пропускная способность:</strong> <span class="math">Q = 1 - p<sub>K</sub></span>.</li>
+                <li><strong>Среднее число заявок:</strong> <span class="math">L = &Sigma; (i &middot; p<sub>i</sub>)</span> (математическое ожидание длины очереди).</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Заключение</h2>
+        <p><strong>Рекуррентный метод</strong> является наиболее точным для процессов рождения-гибели, так как он аналитический (работает через свойства графа состояний). Матричные методы являются универсальными (подходят для расчёта любых сложных сетей с нетривиальными переходами), но решаются численно и имеют незначительную ошибку машинного округления.</p>
+    </div>
+
+</body>
+</html>
